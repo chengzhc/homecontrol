@@ -61,7 +61,6 @@ class RegisterPageState extends State<RegisterPage> {
         Expanded(
             child: TextField(
           controller: tf_mobileController,
-          obscureText: false,
           style: TextStyle(fontSize: 20),
           decoration: InputDecoration(
             border: OutlineInputBorder(),
@@ -79,7 +78,6 @@ class RegisterPageState extends State<RegisterPage> {
           flex: 2,
           child: TextField(
             controller: tf_verifyCodeController,
-            obscureText: false,
             style: TextStyle(fontSize: 20),
             decoration: InputDecoration(
               border: OutlineInputBorder(),
