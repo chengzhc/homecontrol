@@ -11,10 +11,10 @@ class RegisterPage extends StatefulWidget {
 
 class RegisterPageState extends State<RegisterPage> {
   bool _isAgree = true;
-  Widget title, tf_mobile, tf_passwd, btn_login, row_verifyCode, row_gotoLogin;
-  TextEditingController tf_mobileController,
-      tf_verifyCodeController,
-      tf_passwdController;
+  Widget title, tf_mobile, tf_passwd, btn_register, row_verifyCode, row_gotoLogin;
+  final TextEditingController tf_mobileController = new TextEditingController(),
+      tf_verifyCodeController = new TextEditingController(),
+      tf_passwdController = new TextEditingController();
   Text txt_btnVerifyCode;
 
   Widget build(BuildContext context) {
@@ -22,8 +22,7 @@ class RegisterPageState extends State<RegisterPage> {
     _initView();
     return Scaffold(
         backgroundColor: Color(0xFFFFFFFF),
-        body: Form(
-            child: ListView(
+        body: ListView(
           padding: EdgeInsets.symmetric(horizontal: 22.0, vertical: 100.0),
           children: <Widget>[
             title,
@@ -35,10 +34,10 @@ class RegisterPageState extends State<RegisterPage> {
             tf_passwd,
             SizedBox(height: 10),
             row_gotoLogin,
-            SizedBox(height: 40),
-            btn_login,
+            SizedBox(height: 80),
+            btn_register,
           ],
-        )));
+        ));
   }
 
   void _initData() {}
@@ -54,87 +53,108 @@ class RegisterPageState extends State<RegisterPage> {
         )
       ],
     );
-    tf_mobileController = new TextEditingController();
-    tf_mobile = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Expanded(
-            child: TextField(
-          controller: tf_mobileController,
-          style: TextStyle(fontSize: 20),
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: '手机',
-          ),
-        ))
-      ],
-    );
 
-    tf_verifyCodeController = new TextEditingController();
-    row_verifyCode = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Expanded(
-          flex: 2,
-          child: TextField(
-            controller: tf_verifyCodeController,
-            style: TextStyle(fontSize: 20),
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: '验证码',
+    tf_mobile = Container(
+        height: 50,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+                child: TextField(
+              controller: tf_mobileController,
+              style: TextStyle(fontSize: 20),
+              decoration: InputDecoration(
+                  icon: Icon(
+                Icons.phone_android,
+                color: Colors.blueAccent,
+                size: 35.0,
+              ),
+                border: OutlineInputBorder(),
+                labelText: '手机',
+              ),
+            ))
+          ],
+        ));
+
+    row_verifyCode = Container(
+        height: 50,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: TextField(
+                controller: tf_verifyCodeController,
+                style: TextStyle(fontSize: 20),
+                decoration: InputDecoration(
+                  icon:  Icon(
+                    Icons.verified_user,
+                    color: Colors.blueAccent,
+                    size: 35.0,
+                  ),
+                  border: OutlineInputBorder(),
+                  labelText: '验证码',
+                ),
+              ),
             ),
-          ),
-        ),
-        SizedBox(width: 16),
-        Expanded(
-            child: Container(
-          height: 60,
-          child: RaisedButton(
-            color: Colors.blueAccent,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5))),
-            onPressed: _getVerifyCode,
-            child: Text("验证码",
-                style: TextStyle(color: Colors.white, fontSize: 20)),
-          ),
-        ))
-      ],
-    );
+            SizedBox(width: 16),
+            Expanded(
+                child: Container(
+              height: 60,
+              child: RaisedButton(
+                color: Colors.blueAccent,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                onPressed: _getVerifyCode,
+                child: Text("获取",
+                    style: TextStyle(color: Colors.white, fontSize: 20)),
+              ),
+            ))
+          ],
+        ));
 
-    tf_passwdController = new TextEditingController();
-    tf_passwd = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Expanded(
-            child: TextField(
-          controller: tf_passwdController,
-          obscureText: true,
-          style: TextStyle(fontSize: 20),
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: '密码',
-          ),
-        )),
-      ],
-    );
-    btn_login = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Expanded(
-            child: RaisedButton(
-          color: Colors.blueAccent,
-          onPressed: () {
-            _register();
-          },
-          textColor: Colors.white,
-          padding: const EdgeInsets.all(0.0),
-          child: Container(
-            padding: const EdgeInsets.all(10.0),
-            child: const Text('注        册', style: TextStyle(fontSize: 20)),
-          ),
-        ))
-      ],
-    );
+    tf_passwd = Container(
+        height: 50,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+                child: TextField(
+                  controller: tf_passwdController,
+                  obscureText: true,
+                  style: TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.lock,
+                      color: Colors.blueAccent,
+                      size: 35.0,
+                    ),
+                    border: OutlineInputBorder(),
+                    labelText: '密码',
+                  ),
+            )),
+          ],
+        ));
+    btn_register = Container(
+        height: 50,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+                child: RaisedButton(
+              color: Colors.blueAccent,
+              onPressed: () {
+                _register();
+              },
+              textColor: Colors.white,
+              padding: const EdgeInsets.all(0.0),
+              child: Container(
+                padding: const EdgeInsets.all(10.0),
+                child: const Text('注        册', style: TextStyle(fontSize: 20)),
+              ),
+            ))
+          ],
+        ));
     row_gotoLogin = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
@@ -150,16 +170,13 @@ class RegisterPageState extends State<RegisterPage> {
           ),
           Text("我已同意"),
           FlatButton(
-            padding:EdgeInsets.symmetric(horizontal:0, vertical: 0),
+            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             onPressed: _showProtocol,
             child: Text(
               "《用户协议》",
-            style: TextStyle(
-                color:Colors.pinkAccent
-            ),
+              style: TextStyle(color: Colors.pinkAccent),
             ),
           )
-
         ]),
         FlatButton(
           onPressed: () {
@@ -171,12 +188,21 @@ class RegisterPageState extends State<RegisterPage> {
           },
           child: Text(
             "直接登录",
-            style: TextStyle(fontSize: 20, color: Colors.blueAccent),
+            style: TextStyle(fontSize: 18, color: Colors.blueAccent),
             textAlign: TextAlign.right,
           ),
         )
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    tf_mobileController.dispose();
+    tf_verifyCodeController.dispose();
+    tf_passwdController.dispose();
+    super.dispose();
   }
 
   void _clickCheckBox() {
@@ -206,7 +232,7 @@ class RegisterPageState extends State<RegisterPage> {
                 ]));
   }
 
-  void _showProtocol(){
+  void _showProtocol() {
     print("showProtol");
   }
 }
