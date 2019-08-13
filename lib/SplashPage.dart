@@ -12,7 +12,9 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
-    return new Image.asset("images/home_control.jpg");
+    return new Image.asset(
+      "images/home_control.jpg",
+      fit: BoxFit.cover,);
   }
 
   @override

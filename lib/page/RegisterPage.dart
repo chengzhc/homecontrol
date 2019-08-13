@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:homecontrol/page/LoginPage.dart';
+import 'package:flutter/services.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -22,22 +23,46 @@ class RegisterPageState extends State<RegisterPage> {
     _initView();
     return Scaffold(
         backgroundColor: Color(0xFFFFFFFF),
-        body: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 22.0, vertical: 100.0),
-          children: <Widget>[
-            title,
-            SizedBox(height: 60),
-            tf_mobile,
-            SizedBox(height: 20),
-            row_verifyCode,
-            SizedBox(height: 20),
-            tf_passwd,
-            SizedBox(height: 10),
-            row_gotoLogin,
-            SizedBox(height: 80),
-            btn_register,
-          ],
-        ));
+        body: 
+        Stack(
+          children:<Widget>[
+            Container(
+              constraints: BoxConstraints.expand(
+//                height: Theme.of(context).textTheme.display1.fontSize * 1.1 + 200.0,
+              ),
+              padding: const EdgeInsets.all(0.0),
+              child:
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end:Alignment.centerRight,
+                    colors: <Color>[
+                      const Color(0xFFEEEEEE),
+                      const Color(0xFFCCCCDD),
+                    ],
+                    stops: <double>[0.5, 1.0],
+                  ),
+                ),
+              ),
+            ),
+            ListView(
+              padding: EdgeInsets.symmetric(horizontal: 22.0, vertical: 100.0),
+              children: <Widget>[
+                title,
+                SizedBox(height: 60),
+                tf_mobile,
+                SizedBox(height: 20),
+                row_verifyCode,
+                SizedBox(height: 20),
+                tf_passwd,
+                SizedBox(height: 10),
+                row_gotoLogin,
+                SizedBox(height: 80),
+                btn_register,
+              ],
+            )])
+    );
   }
 
   void _initData() {}
@@ -49,7 +74,7 @@ class RegisterPageState extends State<RegisterPage> {
         Expanded(
           child: Text("注册",
               textAlign: TextAlign.left,
-              style: TextStyle(color: Colors.black54, fontSize: 35)),
+              style: TextStyle(color: Colors.black45, fontSize: 35)),
         )
       ],
     );
@@ -61,20 +86,26 @@ class RegisterPageState extends State<RegisterPage> {
           children: <Widget>[
             Expanded(
                 child: TextField(
-              controller: tf_mobileController,
-              style: TextStyle(fontSize: 20),
-              decoration: InputDecoration(
-                  icon: Icon(
-                Icons.phone_android,
-                color: Colors.blueAccent,
-                size: 35.0,
-              ),
-                border: OutlineInputBorder(),
-                labelText: '手机',
-              ),
+                  controller: tf_mobileController,
+                  style: TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                      icon: Icon(
+                        Icons.phone_android,
+                        color: Colors.blueAccent,
+                        size: 35.0,
+                      ),
+
+                      border: OutlineInputBorder(),
+                      labelText: '手机',
+                  ),
+                  inputFormatters: <TextInputFormatter>[
+                      WhitelistingTextInputFormatter.digitsOnly,//只输入数字
+                      LengthLimitingTextInputFormatter(11)//限制长度
+                  ],
             ))
           ],
         ));
+
 
     row_verifyCode = Container(
         height: 50,
@@ -95,6 +126,10 @@ class RegisterPageState extends State<RegisterPage> {
                   border: OutlineInputBorder(),
                   labelText: '验证码',
                 ),
+                inputFormatters: <TextInputFormatter>[
+                  WhitelistingTextInputFormatter.digitsOnly,//只输入数字
+                  LengthLimitingTextInputFormatter(4)//限制长度
+                ],
               ),
             ),
             SizedBox(width: 16),
@@ -187,7 +222,7 @@ class RegisterPageState extends State<RegisterPage> {
             }));
           },
           child: Text(
-            "直接登录",
+            "已有账号",
             style: TextStyle(fontSize: 18, color: Colors.blueAccent),
             textAlign: TextAlign.right,
           ),
