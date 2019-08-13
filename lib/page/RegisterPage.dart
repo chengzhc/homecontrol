@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:homecontrol/page/LoginPage.dart';
 import 'package:flutter/services.dart';
 
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:homecontrol/czlibrary/Cz_HTTP.dart';
+
+import 'package:homecontrol/constant.dart';
+
 class RegisterPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -17,6 +24,8 @@ class RegisterPageState extends State<RegisterPage> {
       tf_verifyCodeController = new TextEditingController(),
       tf_passwdController = new TextEditingController();
   Text txt_btnVerifyCode;
+
+  var httpClient = new HttpClient();
 
   Widget build(BuildContext context) {
     _initData();
@@ -85,24 +94,24 @@ class RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Expanded(
-                child: TextField(
-                  controller: tf_mobileController,
-                  style: TextStyle(fontSize: 20),
-                  decoration: InputDecoration(
-                      icon: Icon(
-                        Icons.phone_android,
-                        color: Colors.blueAccent,
-                        size: 35.0,
-                      ),
-
-                      border: OutlineInputBorder(),
-                      labelText: '手机',
+              child: TextField(
+                controller: tf_mobileController,
+                style: TextStyle(fontSize: 20),
+                decoration: InputDecoration(
+                  icon:  Icon(
+                    Icons.phone_android,
+                    color: Colors.blueAccent,
+                    size: 35.0,
                   ),
-                  inputFormatters: <TextInputFormatter>[
-                      WhitelistingTextInputFormatter.digitsOnly,//只输入数字
-                      LengthLimitingTextInputFormatter(11)//限制长度
-                  ],
-            ))
+                  border: OutlineInputBorder(),
+                  labelText: '手机',
+                ),
+                inputFormatters: <TextInputFormatter>[
+                  WhitelistingTextInputFormatter.digitsOnly,//只输入数字
+                  LengthLimitingTextInputFormatter(11)//限制长度
+                ],
+              ),
+            ),
           ],
         ));
 
@@ -244,8 +253,16 @@ class RegisterPageState extends State<RegisterPage> {
     print("_clickCheckBox");
   }
 
-  void _getVerifyCode() {
+  void _getVerifyCode() async  {
     print("_getVerifyCode");
+    var url = Constant.DOMAIN+"/module_data/monitor/get_verify_code?mobile="+tf_mobileController.text;
+    Cz_HTTP.czPost(url,
+          (var feedBackData)=>{
+            print("czPostSuccess: "+feedBackData["data"].toString())
+          },
+          (var feedBackData)=>{
+            print("czPostFail: "+feedBackData["err_info"].toString())
+          },);
   }
 
   void _register() {
