@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:homecontrol/czlibrary/CzLibrary.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -39,5 +40,13 @@ class Page extends State<MinePage> {
       'http://a.hiphotos.baidu.com/image/pic/item/4610b912c8fcc3cebba8b8e09c45d688d53f20fc.jpg',
 
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((callback) {
+      CzLibrary.removeUserData("token");
+    });
   }
 }

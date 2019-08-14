@@ -3,10 +3,29 @@ import 'dart:io';
 
 
 class Cz_HTTP {
-  static void czPost  (String url,var successCallBack,var failCallBack) async {
+
+  /**
+   *  var url = Constant.DOMAIN+"/module_data/monitor/get_verify_code?mobile="+tf_mobileController.text;
+      Cz_HTTP.czRequest(url,
+        "post",
+        (var feedBackData)=>{
+        print("czPostSuccess: "+feedBackData["data"].toString())
+        },
+        (var feedBackData)=>{
+        print("czPostFail: "+feedBackData["err_info"].toString())
+        },
+      );
+   */
+  static void czRequest (String url,String method,var successCallBack,var failCallBack) async {
     var httpClient = new HttpClient();
     try {
-      var request = await httpClient.postUrl(Uri.parse(url));
+      var request;
+      if (method.toLowerCase()=="post") {
+        request = await httpClient.postUrl(Uri.parse(url));
+      }else{
+        request = await httpClient.getUrl(Uri.parse(url));
+      }
+
       var response = await request.close();
       if (response.statusCode == HttpStatus.ok) {
         var json = await response.transform(utf8.decoder).join();
@@ -30,7 +49,19 @@ class Cz_HTTP {
     }
   }
 
-  static void post  (String url,var successCallBack,var failCallBack) async {
+  /**
+   *  var url = Constant.DOMAIN+"/module_data/monitor/get_verify_code?mobile="+tf_mobileController.text;
+      Cz_HTTP.czRequest(url,
+      "post",
+      (var feedBackData)=>{
+      print("czPostSuccess: "+feedBackData.toString());
+      },
+      (var code,var info)=>{
+      print("czPostFail: code="+code.toString()+", info="+info.toString());
+      },
+      );
+   */
+  static void request (String url,String method,var successCallBack,var failCallBack) async {
     var httpClient = new HttpClient();
     try {
       var request = await httpClient.postUrl(Uri.parse(url));

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:homecontrol/page/LoginPage.dart';
+import 'package:homecontrol/MainPage.dart';
 import 'package:flutter/services.dart';
-
-import 'dart:convert';
+import 'package:homecontrol/czlibrary/CzLibrary.dart';
 import 'dart:io';
-
+import 'dart:async';
 import 'package:homecontrol/czlibrary/Cz_HTTP.dart';
 
 import 'package:homecontrol/constant.dart';
+
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -18,14 +19,21 @@ class RegisterPage extends StatefulWidget {
 }
 
 class RegisterPageState extends State<RegisterPage> {
+  static final int MAX_COUNT_DOWN=30;
   bool _isAgree = true;
-  Widget title, tf_mobile, tf_passwd, btn_register, row_verifyCode, row_gotoLogin;
+  Widget title, tf_mobile, tf_passwd,tf_repasswd, btn_register, row_verifyCode, row_gotoLogin;
   final TextEditingController tf_mobileController = new TextEditingController(),
       tf_verifyCodeController = new TextEditingController(),
-      tf_passwdController = new TextEditingController();
+      tf_passwdController = new TextEditingController(),
+      tf_repasswdController = new TextEditingController();
   Text txt_btnVerifyCode;
 
+  String str_btnVerifyCode="获取";
+
   var httpClient = new HttpClient();
+
+  int currentCountDown=0;
+  Timer _countdownTimer;
 
   Widget build(BuildContext context) {
     _initData();
@@ -65,9 +73,11 @@ class RegisterPageState extends State<RegisterPage> {
                 row_verifyCode,
                 SizedBox(height: 20),
                 tf_passwd,
+                SizedBox(height: 20),
+                tf_repasswd,
                 SizedBox(height: 10),
                 row_gotoLogin,
-                SizedBox(height: 80),
+                SizedBox(height: 60),
                 btn_register,
               ],
             )])
@@ -150,7 +160,7 @@ class RegisterPageState extends State<RegisterPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 onPressed: _getVerifyCode,
-                child: Text("获取",
+                child: Text("$str_btnVerifyCode",
                     style: TextStyle(color: Colors.white, fontSize: 20)),
               ),
             ))
@@ -169,7 +179,7 @@ class RegisterPageState extends State<RegisterPage> {
                   style: TextStyle(fontSize: 20),
                   decoration: InputDecoration(
                     icon: Icon(
-                      Icons.lock,
+                      Icons.lock_outline,
                       color: Colors.blueAccent,
                       size: 35.0,
                     ),
@@ -177,6 +187,28 @@ class RegisterPageState extends State<RegisterPage> {
                     labelText: '密码',
                   ),
             )),
+          ],
+        ));
+    tf_repasswd = Container(
+        height: 50,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+                child: TextField(
+                  controller: tf_repasswdController,
+                  obscureText: true,
+                  style: TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.lock,
+                      color: Colors.blueAccent,
+                      size: 35.0,
+                    ),
+                    border: OutlineInputBorder(),
+                    labelText: '重复密码',
+                  ),
+                )),
           ],
         ));
     btn_register = Container(
@@ -253,35 +285,81 @@ class RegisterPageState extends State<RegisterPage> {
     print("_clickCheckBox");
   }
 
+  bool _isCountDown(){
+    return currentCountDown>0;
+  }
+
+  void startCountDown() async {
+    currentCountDown=MAX_COUNT_DOWN;
+
+
+      print("countDown=$currentCountDown");
+      Timer.periodic(new Duration(seconds: 1), (timer)
+      {
+        setState(() {
+          if (currentCountDown > 0) {
+            str_btnVerifyCode = '${currentCountDown--}';
+          } else {
+            str_btnVerifyCode = '获取';
+            timer.cancel();
+            timer = null;
+          }
+        });
+      });
+
+  }
+
   void _getVerifyCode() async  {
     print("_getVerifyCode");
+
+    if(_isCountDown()){
+      CzLibrary.alert(context, "验证码发送中，请稍后再试");
+      return;
+    }
+
+    startCountDown();
+
     var url = Constant.DOMAIN+"/module_data/monitor/get_verify_code?mobile="+tf_mobileController.text;
-    Cz_HTTP.czPost(url,
-          (var feedBackData)=>{
-            print("czPostSuccess: "+feedBackData["data"].toString())
+    Cz_HTTP.czRequest(url,"post",
+          (var feedBackData) {
+//            print("czPostSuccess: "+feedBackData["data"].toString())
+            CzLibrary.saveUserData("verify_token", feedBackData["data"].toString());
+            CzLibrary.alert(context, "验证码已通过短信发送，请注意查收");
+            currentCountDown=0;
           },
-          (var feedBackData)=>{
-            print("czPostFail: "+feedBackData["err_info"].toString())
+          (var feedBackData){
+            print("czPostFail: "+feedBackData["err_info"].toString());
+            CzLibrary.alert(context,feedBackData["err_info"].toString());
+            currentCountDown=0;
           },);
   }
 
-  void _register() {
+  void _register() async {
     String mobile = tf_mobileController.text;
-    String passwd = tf_passwdController.text;
+    String code=tf_verifyCodeController.text;
+    String password = tf_passwdController.text;
+    String repassword = tf_repasswdController.text;
+    String verify_token= await CzLibrary.getUserData("verify_token");
 
-    showDialog(
-        context: context,
-        builder: (_) => new AlertDialog(
-                content:
-                    new Text("登陆\nmobile=" + mobile + "\npasswd=" + passwd),
-                actions: <Widget>[
-                  new FlatButton(
-                    child: new Text("确定"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ]));
+    String url=Constant.DOMAIN+"/module_data/monitor/register?"
+        +"mobile="+mobile
+        +"&code="+code
+        +"&password="+password
+        +"&repassword="+repassword
+        +"&verify_token="+verify_token;
+
+    Cz_HTTP.czRequest(url, "post",
+        (var feedBackData){
+          CzLibrary.saveUserData("token", feedBackData["data"]);
+          Navigator.of(context).pushReplacement(new PageRouteBuilder(pageBuilder:
+              (BuildContext context, Animation<double> animation,
+              Animation<double> secondaryAnimation) {
+            return new MainPage("some attrs you like ");
+          }));
+        },
+        (var feedBackData){
+          CzLibrary.alert(context,feedBackData["err_info"].toString(),strConfirm:"确定");
+        });
   }
 
   void _showProtocol() {
