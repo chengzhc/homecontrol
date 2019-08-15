@@ -6,9 +6,8 @@ import 'package:homecontrol/czlibrary/CzLibrary.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:homecontrol/czlibrary/Cz_HTTP.dart';
-
 import 'package:homecontrol/constant.dart';
-
+import 'package:homecontrol/page/ProtocolPage.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -20,12 +19,16 @@ class RegisterPage extends StatefulWidget {
 
 class RegisterPageState extends State<RegisterPage> {
   static final int MAX_COUNT_DOWN=30;
+
   bool _isAgree = true;
+
   Widget title, tf_mobile, tf_passwd,tf_repasswd, btn_register, row_verifyCode, row_gotoLogin;
+
   final TextEditingController tf_mobileController = new TextEditingController(),
       tf_verifyCodeController = new TextEditingController(),
       tf_passwdController = new TextEditingController(),
       tf_repasswdController = new TextEditingController();
+
   Text txt_btnVerifyCode;
 
   String str_btnVerifyCode="获取";
@@ -33,7 +36,6 @@ class RegisterPageState extends State<RegisterPage> {
   var httpClient = new HttpClient();
 
   int currentCountDown=0;
-  Timer _countdownTimer;
 
   Widget build(BuildContext context) {
     _initData();
@@ -285,14 +287,8 @@ class RegisterPageState extends State<RegisterPage> {
     print("_clickCheckBox");
   }
 
-  bool _isCountDown(){
-    return currentCountDown>0;
-  }
-
   void startCountDown() async {
     currentCountDown=MAX_COUNT_DOWN;
-
-
       print("countDown=$currentCountDown");
       Timer.periodic(new Duration(seconds: 1), (timer)
       {
@@ -306,13 +302,12 @@ class RegisterPageState extends State<RegisterPage> {
           }
         });
       });
-
   }
 
   void _getVerifyCode() async  {
     print("_getVerifyCode");
 
-    if(_isCountDown()){
+    if(currentCountDown>0){
       CzLibrary.alert(context, "验证码发送中，请稍后再试");
       return;
     }
@@ -325,7 +320,6 @@ class RegisterPageState extends State<RegisterPage> {
 //            print("czPostSuccess: "+feedBackData["data"].toString())
             CzLibrary.saveUserData("verify_token", feedBackData["data"].toString());
             CzLibrary.alert(context, "验证码已通过短信发送，请注意查收");
-            currentCountDown=0;
           },
           (var feedBackData){
             print("czPostFail: "+feedBackData["err_info"].toString());
@@ -335,6 +329,11 @@ class RegisterPageState extends State<RegisterPage> {
   }
 
   void _register() async {
+    if(!_isAgree){
+      CzLibrary.alert(context, "请先同意《用户协议》");
+      return;
+    }
+
     String mobile = tf_mobileController.text;
     String code=tf_verifyCodeController.text;
     String password = tf_passwdController.text;
@@ -363,6 +362,10 @@ class RegisterPageState extends State<RegisterPage> {
   }
 
   void _showProtocol() {
-    print("showProtol");
+    Navigator.of(context).push(new PageRouteBuilder(pageBuilder:
+        (BuildContext context, Animation<double> animation,
+        Animation<double> secondaryAnimation) {
+      return new ProtocolPage();
+    }));
   }
 }
